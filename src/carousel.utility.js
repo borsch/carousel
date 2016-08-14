@@ -3,8 +3,8 @@
 	var ANIMATION_TIME = 1000;
 	var FRAMES = ANIMATION_TIME / 100;
 
-	var WINDOW_WIDTH = 1366;
-	var WINDTH_HEIGHT = 650;
+	var WINDOW_WIDTH = window.innerWidth;
+	var WINDTH_HEIGHT = window.innerHeight;
 
 	/**
 	 *
@@ -23,6 +23,11 @@
 		var containers = element.find('.carousel-container');
 		var LENGTH = containers.size();
 		var CURRENT = 0;	
+
+		window.onresize = function(){
+			WINDOW_WIDTH = window.innerWidth;
+			WINDTH_HEIGHT = window.innerHeight;
+		};
 
 		if (window.addEventListener) {
 			// IE9, Chrome, Safari, Opera
