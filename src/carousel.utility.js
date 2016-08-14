@@ -6,6 +6,13 @@
 	var WINDOW_WIDTH = window.innerWidth;
 	var WINDTH_HEIGHT = window.innerHeight;
 
+	var DIRECTIONS = {
+		left: left,
+		right: right,
+		up: up,
+		down: down
+	};
+
 	/**
 	 *
 	 * @param {string} selector - selector for dom elements(only container required)
@@ -23,6 +30,7 @@
 		var containers = element.find('.carousel-container');
 		var LENGTH = containers.size();
 		var CURRENT = 0;	
+		var directions = options.directions;
 
 		window.onresize = function(){
 			WINDOW_WIDTH = window.innerWidth;
@@ -44,37 +52,43 @@
 			var previousPosition = 0;	
 
 			return function(e){
-				if(!animationInProcess){
-					animationInProcess = true;
-					
+				if(!animationInProcess){					
 					var oldElem = containers.get(CURRENT);
 					var newElem;
+					var newIndex;
 					var direction;
 
 					var delta = e.deltaY || e.detail || e.wheelDelta;
 					if(delta + previousPosition > previousPosition){
-						var newIndex = (CURRENT == 0 ? containers.size() - 1 : CURRENT-1); 
-						newElem = containers.get(newIndex);
-						CURRENT = newIndex;
-						
-						direction = up;
-					} else {
-						var newIndex = (CURRENT+1 == containers.size() ? 0 : CURRENT+1); 
-						newElem = containers.get(newIndex);
-						CURRENT = newIndex;
+						newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
 
-						direction = down;
+						direction = (DIRECTIONS[directions[CURRENT]] ? directions[CURRENT] : 'down');
+					} else {
+						newIndex = (CURRENT > 0 ? CURRENT-1 : null);
+
+						var oposite = opositDirection(directions[newIndex])
+						direction = (DIRECTIONS[oposite] ? oposite : 'up');
 					}
-					direction(oldElem, newElem, WINDOW_WIDTH, WINDTH_HEIGHT, ANIMATION_TIME, function(){
+
+					if(newIndex != null){
+						animationInProcess = true;
+
+						newElem = containers.get(newIndex);
+						CURRENT = newIndex;
+						DIRECTIONS[direction](oldElem, newElem, WINDOW_WIDTH, WINDTH_HEIGHT, ANIMATION_TIME, function(){
+							animationInProcess = false;
+							oldElem.hide();
+						});
+						previousPosition += delta;
+					} else {
 						animationInProcess = false;
-						oldElem.hide();
-					});
-					previousPosition += delta;
+					}
 				}
 			}
 		}
+	};
 
-		function right(oldElem, newElem, width, height, time, callback){
+	function right(oldElem, newElem, width, height, time, callback){
 			newElem.show().css('left', (-width) + 'px').css('top', '0px'); 
 			oldElem.show().css('left', '0px').css('top', '0px');
 			
@@ -179,7 +193,6 @@
 				}
 			}, FRAMES);
 		}
-	};
 
 	function defaultEasing(value){
 		return 1 - Math.cos(value);
@@ -246,6 +259,21 @@
 	function removeScroll(){
 		document.documentElement.style.overflow = 'hidden';  // firefox, chrome
     	document.body.scroll = "no"; // ie only
+	}
+
+	function opositDirection(direction){
+		switch(direction){
+			case 'up':
+				return 'down';
+			case 'down':
+				return 'up';
+			case 'left':
+				return 'right';
+			case 'right':
+				return 'left';
+			default:
+				return null;
+		}
 	}
 
 })(window);

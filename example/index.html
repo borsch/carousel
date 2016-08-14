@@ -22,9 +22,27 @@
 		<div class="carousel-container">
 			<img src="../images/3.jpg">
 		</div>
+		<div class="carousel-container">
+			<img src="../images/1.jpg">
+		</div>
+		<div class="carousel-container">
+			<img src="../images/2.jpg">
+		</div>
+		<div class="carousel-container">
+			<img src="../images/3.jpg">
+		</div>
 	</div>
 	<script>
-		CarouselInit('.carousel-main-container');
+		CarouselInit('.carousel-main-container', {
+			directions: [
+				'up',
+				'up',
+				'left',
+				'up',
+				'right',
+				'up'
+			]
+		});
 	</script>
 </body>
 </html>
