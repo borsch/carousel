@@ -1,6 +1,6 @@
 (function(exports){
 
-	var ANIMATION_TIME = 1000;
+	var ANIMATION_TIME = 400;
 	var FRAMES = ANIMATION_TIME / 100;
 
 	var WINDOW_WIDTH = window.innerWidth;
@@ -30,7 +30,11 @@
 		var containers = element.find('.carousel-container');
 		var LENGTH = containers.size();
 		var CURRENT = 0;	
-		var directions = options.directions;
+
+		options = options || {};
+
+		var directions = options.directions || [];
+		var easing = (options.easing && typeof options.easing === 'function' ? options.easing : defaultEasing);
 
 		window.onresize = function(){
 			WINDOW_WIDTH = window.innerWidth;
@@ -46,49 +50,69 @@
 			// IE 6/7/8
 			window.attachEvent("onmousewheel", MouseWheelHandler());
 		}
+		var animationInProcess = false;
+		window.onkeydown = function(e){
+			if(!animationInProcess){
+				var code = e.keyCode;
+
+				var newIndex;
+
+				if(code == 40){
+					newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
+				} else if(code == 38){
+					newIndex = (CURRENT > 0 ? CURRENT-1 : null);
+				}
+
+				play(newIndex);
+			}
+		}
 
 		function MouseWheelHandler(){
-			var animationInProcess = false;
 			var previousPosition = 0;	
 
 			return function(e){
-				if(!animationInProcess){					
-					var oldElem = containers.get(CURRENT);
-					var newElem;
+				if(!animationInProcess){		
 					var newIndex;
-					var direction;
 
 					var delta = e.deltaY || e.detail || e.wheelDelta;
 					if(delta + previousPosition > previousPosition){
 						newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
-
-						direction = (DIRECTIONS[directions[CURRENT]] ? directions[CURRENT] : 'down');
 					} else {
 						newIndex = (CURRENT > 0 ? CURRENT-1 : null);
-
-						var oposite = opositDirection(directions[newIndex])
-						direction = (DIRECTIONS[oposite] ? oposite : 'up');
 					}
-
-					if(newIndex != null){
-						animationInProcess = true;
-
-						newElem = containers.get(newIndex);
-						CURRENT = newIndex;
-						DIRECTIONS[direction](oldElem, newElem, WINDOW_WIDTH, WINDTH_HEIGHT, ANIMATION_TIME, function(){
-							animationInProcess = false;
-							oldElem.hide();
-						});
+					if(newIndex)
 						previousPosition += delta;
-					} else {
-						animationInProcess = false;
-					}
+
+					play(newIndex);
 				}
+			}
+		}
+
+		function play(newIndex){
+			if(newIndex != null){
+				var direction;
+				if(newIndex < CURRENT){
+					var oposite = opositDirection(directions[newIndex])
+					direction = (DIRECTIONS[oposite] ? oposite : 'down');
+				} else {
+					direction = (DIRECTIONS[directions[CURRENT]] ? directions[CURRENT] : 'up');
+				}
+
+				animationInProcess = true;
+				var oldElem = containers.get(CURRENT);
+				var newElem = containers.get(newIndex);
+				CURRENT = newIndex;
+				DIRECTIONS[direction](easing, oldElem, newElem, WINDOW_WIDTH, WINDTH_HEIGHT, ANIMATION_TIME, function(){
+					animationInProcess = false;
+					oldElem.hide();
+				});
+			} else {
+				animationInProcess = false;
 			}
 		}
 	};
 
-	function right(oldElem, newElem, width, height, time, callback){
+	function right(easing, oldElem, newElem, width, height, time, callback){
 			newElem.show().css('left', (-width) + 'px').css('top', '0px'); 
 			oldElem.show().css('left', '0px').css('top', '0px');
 			
@@ -99,7 +123,7 @@
 				var diff = (new Date().getTime() - start) / time;
 
 				// calculate position in persents based on time difference
-				var result = defaultEasing(diff);
+				var result = easing(diff);
 
 				var oldElemPosition = result*width;
 				var newElemPosition = oldElemPosition - width;
@@ -116,7 +140,7 @@
 			}, FRAMES);
 		}
 
-		function left(oldElem, newElem, width, height, time, callback){
+		function left(easing, oldElem, newElem, width, height, time, callback){
 			newElem.show().css('left', (width) + 'px').css('top', '0px'); 
 			oldElem.show().css('left', '0px').css('top', '0px');
 			var start = new Date().getTime();
@@ -126,7 +150,7 @@
 				var diff = (new Date().getTime() - start) / time;
 
 				// calculate position in persents based on time difference
-				var result = defaultEasing(diff);
+				var result = easing(diff);
 				
 				var oldElemPosition = -width*result;
 				var newElemPosition = oldElemPosition + width;
@@ -142,7 +166,7 @@
 			}, FRAMES);
 		}
 
-		function up(oldElem, newElem, width, height, time, callback){
+		function down(easing, oldElem, newElem, width, height, time, callback){
 			newElem.show().css('left', '0px').css('top', height+'px'); 
 			oldElem.show().css('left', '0px');
 			var start = new Date().getTime();
@@ -152,7 +176,7 @@
 				var diff = (new Date().getTime() - start) / time;
 
 				// calculate position in persents based on time difference
-				var result = defaultEasing(diff);
+				var result = easing(diff);
 				
 				var oldElemPosition = -height*result;
 				var newElemPosition = oldElemPosition + height;
@@ -168,7 +192,7 @@
 			}, FRAMES);
 		}
 
-		function down(oldElem, newElem, width, height, time, callback){
+		function up(easing, oldElem, newElem, width, height, time, callback){
 			newElem.show().css('left', '0px').css('top', (-height)+'px'); 
 			oldElem.show().css('left', '0px').css('top', '0px');
 			var start = new Date().getTime();
@@ -178,7 +202,7 @@
 				var diff = (new Date().getTime() - start) / time;
 
 				// calculate position in persents based on time difference
-				var result = defaultEasing(diff);
+				var result = easing(diff);
 				
 				var oldElemPosition = height*result;
 				var newElemPosition = oldElemPosition - height;
