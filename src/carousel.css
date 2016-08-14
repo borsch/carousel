@@ -18,32 +18,3 @@ body {
 	position: absolute;
 	z-index: 1;
 }
-.carousel-active {
-	display: block;
-}
-.carousel-main-container nav {
-	width: 100px;
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	z-index: 10;
-	position: relative;
-	top: 95%;
-}
-.carousel-main-container ul {
-    list-style-type: none;
-    padding-left: 0px;
-}
-.carousel-main-container ul li { 
-    float: left;
-}
-.carousel-circle {
-	width: 10px;
-	height: 10px;
-	background: #ccc;	
-	margin: 0px 10px;
-	border-radius: 5px;
-}
-.carousel-active-circle {
-	background: blue;
-}
