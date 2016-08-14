@@ -46,9 +46,41 @@
 			// IE 6/7/8
 			window.attachEvent("onmousewheel", MouseWheelHandler());
 		}
+		var animationInProcess = false;
+		window.onkeydown = function(e){
+			if(!animationInProcess){
+				var code = e.keyCode;
+
+				var oldElem = containers.get(CURRENT);
+				var newElem;
+				var newIndex;
+				var direction;
+
+				if(code == 38){
+					newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
+					direction = (DIRECTIONS[directions[CURRENT]] ? directions[CURRENT] : 'down');
+				} else if(code == 40){
+					newIndex = (CURRENT > 0 ? CURRENT-1 : null);
+					var oposite = opositDirection(directions[newIndex])
+					direction = (DIRECTIONS[oposite] ? oposite : 'up');
+				}
+
+				if(newIndex != null){
+					animationInProcess = true;
+
+					newElem = containers.get(newIndex);
+					CURRENT = newIndex;
+					DIRECTIONS[direction](oldElem, newElem, WINDOW_WIDTH, WINDTH_HEIGHT, ANIMATION_TIME, function(){
+						animationInProcess = false;
+						oldElem.hide();
+					});
+				} else {
+					animationInProcess = false;
+				}
+			}
+		}
 
 		function MouseWheelHandler(){
-			var animationInProcess = false;
 			var previousPosition = 0;	
 
 			return function(e){
