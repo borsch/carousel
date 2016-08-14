@@ -3,6 +3,9 @@
 	var ANIMATION_TIME = 1000;
 	var FRAMES = ANIMATION_TIME / 100;
 
+	var WINDOW_WIDTH = 1366;
+	var WINDTH_HEIGHT = 650;
+
 	/**
 	 *
 	 * @param {string} selector - selector for dom elements(only container required)
@@ -46,23 +49,18 @@
 					var delta = e.deltaY || e.detail || e.wheelDelta;
 					if(delta + previousPosition > previousPosition){
 						var newIndex = (CURRENT == 0 ? containers.size() - 1 : CURRENT-1); 
-						console.log(newIndex);
 						newElem = containers.get(newIndex);
 						CURRENT = newIndex;
 						
-						direction = right;
-						/*right(oldElem, newElem, 1366, ANIMATION_TIME, function(){
-							animationInProcess = false;
-						});*/
+						direction = up;
 					} else {
 						var newIndex = (CURRENT+1 == containers.size() ? 0 : CURRENT+1); 
-						console.log(newIndex);
 						newElem = containers.get(newIndex);
 						CURRENT = newIndex;
 
-						direction = left;
+						direction = down;
 					}
-					direction(oldElem, newElem, 1366, ANIMATION_TIME, function(){
+					direction(oldElem, newElem, WINDOW_WIDTH, WINDTH_HEIGHT, ANIMATION_TIME, function(){
 						animationInProcess = false;
 						oldElem.hide();
 					});
@@ -71,9 +69,9 @@
 			}
 		}
 
-		function right(oldElem, newElem, width, time, callback){
-			newElem.show().css('left', (-width) + 'px'); 
-			oldElem.show().css('left', '0px');
+		function right(oldElem, newElem, width, height, time, callback){
+			newElem.show().css('left', (-width) + 'px').css('top', '0px'); 
+			oldElem.show().css('left', '0px').css('top', '0px');
 			
 			var start = new Date().getTime();
 			
@@ -99,9 +97,9 @@
 			}, FRAMES);
 		}
 
-		function left(oldElem, newElem, width, time, callback){
-			newElem.show().css('left', (width) + 'px'); 
-			oldElem.show().css('left', '0px');
+		function left(oldElem, newElem, width, height, time, callback){
+			newElem.show().css('left', (width) + 'px').css('top', '0px'); 
+			oldElem.show().css('left', '0px').css('top', '0px');
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -119,6 +117,58 @@
 				if(result > 0.99){
 					oldElem.css('left', (-width)+'px');
 					newElem.css('left', '0px');
+					clearInterval(timer);
+					callback();
+				}
+			}, FRAMES);
+		}
+
+		function up(oldElem, newElem, width, height, time, callback){
+			newElem.show().css('left', '0px').css('top', height+'px'); 
+			oldElem.show().css('left', '0px');
+			var start = new Date().getTime();
+			
+			var timer = setInterval(function(){
+				// difference in time from last call in percents
+				var diff = (new Date().getTime() - start) / time;
+
+				// calculate position in persents based on time difference
+				var result = defaultEasing(diff);
+				
+				var oldElemPosition = -height*result;
+				var newElemPosition = oldElemPosition + height;
+				newElem.css('top', newElemPosition + 'px');
+				oldElem.css('top', oldElemPosition + 'px');
+				
+				if(result > 0.99){
+					oldElem.css('top', (-height)+'px');
+					newElem.css('top', '0px');
+					clearInterval(timer);
+					callback();
+				}
+			}, FRAMES);
+		}
+
+		function down(oldElem, newElem, width, height, time, callback){
+			newElem.show().css('left', '0px').css('top', (-height)+'px'); 
+			oldElem.show().css('left', '0px').css('top', '0px');
+			var start = new Date().getTime();
+			
+			var timer = setInterval(function(){
+				// difference in time from last call in percents
+				var diff = (new Date().getTime() - start) / time;
+
+				// calculate position in persents based on time difference
+				var result = defaultEasing(diff);
+				
+				var oldElemPosition = height*result;
+				var newElemPosition = oldElemPosition - height;
+				newElem.css('top', newElemPosition + 'px');
+				oldElem.css('top', oldElemPosition + 'px');
+				
+				if(result > 0.99){
+					oldElem.css('top', (-height)+'px');
+					newElem.css('top', '0px');
 					clearInterval(timer);
 					callback();
 				}
