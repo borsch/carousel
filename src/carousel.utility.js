@@ -1,7 +1,7 @@
 (function(exports){
 
 	var ANIMATION_TIME = 1000;
-	var FRAMES = ANIMATION_TIME / 50;
+	var FRAMES = ANIMATION_TIME / 100;
 
 	/**
 	 *
@@ -17,42 +17,57 @@
 	}
 
 	var Carousel = function(element, options){
+		var containers = element.find('.carousel-container');
+		var LENGTH = containers.size();
+		var CURRENT = 0;	
+
 		if (window.addEventListener) {
 			// IE9, Chrome, Safari, Opera
-			window.addEventListener("mousewheel", MouseWheelHandler, false);
+			window.addEventListener("mousewheel", MouseWheelHandler(), false);
 			// Firefox
-			window.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
+			window.addEventListener("DOMMouseScroll", MouseWheelHandler(), false);
 		} else {
 			// IE 6/7/8
-			window.attachEvent("onmousewheel", MouseWheelHandler);
+			window.attachEvent("onmousewheel", MouseWheelHandler());
 		}
-		
-		var oldElem = new Element('.carousel-container[data-container="0"]');
-		var newElem = new Element('.carousel-container[data-container="1"]');
-		
-		var animationInProcess = false;
-		var previousPosition = 0;		
-		
-		function MouseWheelHandler(e) {
-			if(!animationInProcess){
-				animationInProcess = true;
-				var delta = e.deltaY || e.detail || e.wheelDelta;
-				if(delta + previousPosition > previousPosition){
-					right(oldElem, newElem, 1366, ANIMATION_TIME, function(){
+
+		function MouseWheelHandler(){
+			var animationInProcess = false;
+			var previousPosition = 0;	
+
+			return function(e){
+				if(!animationInProcess){
+					animationInProcess = true;
+					
+					var oldElem = containers.get(CURRENT);
+					var newElem;
+					var direction;
+
+					var delta = e.deltaY || e.detail || e.wheelDelta;
+					if(delta + previousPosition > previousPosition){
+						var newIndex = (CURRENT == 0 ? containers.size() - 1 : CURRENT-1); 
+						console.log(newIndex);
+						newElem = containers.get(newIndex);
+						CURRENT = newIndex;
+						
+						direction = right;
+						/*right(oldElem, newElem, 1366, ANIMATION_TIME, function(){
+							animationInProcess = false;
+						});*/
+					} else {
+						var newIndex = (CURRENT+1 == containers.size() ? 0 : CURRENT+1); 
+						console.log(newIndex);
+						newElem = containers.get(newIndex);
+						CURRENT = newIndex;
+
+						direction = left;
+					}
+					direction(oldElem, newElem, 1366, ANIMATION_TIME, function(){
 						animationInProcess = false;
-						var temp = oldElem;
-						oldElem = newElem;
-						newElem = temp;
+						oldElem.hide();
 					});
-				} else {
-					left(oldElem, newElem, 1366, ANIMATION_TIME, function(){
-						animationInProcess = false;
-						var temp = oldElem;
-						oldElem = newElem;
-						newElem = temp;
-					});
+					previousPosition += delta;
 				}
-				previousPosition += delta;
 			}
 		}
 
@@ -85,9 +100,8 @@
 		}
 
 		function left(oldElem, newElem, width, time, callback){
-			newElem.show();//.css('left', (width) + 'px'); 
-			oldElem.show();//.css('left', '0px');
-			
+			newElem.show().css('left', (width) + 'px'); 
+			oldElem.show().css('left', '0px');
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -99,12 +113,12 @@
 				
 				var oldElemPosition = -width*result;
 				var newElemPosition = oldElemPosition + width;
-				newElem.css('left', oldElemPosition + 'px');
-				oldElem.css('left', newElemPosition + 'px');
+				newElem.css('left', newElemPosition + 'px');
+				oldElem.css('left', oldElemPosition + 'px');
 				
 				if(result > 0.99){
-					oldElem.css('left', '0px');
-					newElem.css('left', width + 'px');
+					oldElem.css('left', (-width)+'px');
+					newElem.css('left', '0px');
 					clearInterval(timer);
 					callback();
 				}
@@ -161,6 +175,15 @@
 					element.style.display = 'block';
 				});
 				return this;
+			},
+			hide: function(){
+				this.each(function(element){
+					element.style.display = 'none';
+				});
+				return this;
+			},
+			get: function(index){
+				return new Element([elements[index]]);
 			}
 		}
 	}
