@@ -21,18 +21,20 @@
 	 * @param {number} [options.time] - time for animation
 	 */
 	exports.CarouselInit = function(seletor, options){
-		if(!isMobile()) {
-			removeScroll();
+		removeScroll();
 
-			var mainContainer = new Element(seletor);
-			new Carousel(mainContainer, options);
-		} else {
-			console.error('Not support mobile phones in current version');
-		}
+		var mainContainer = new Element(seletor);
+		new Carousel(mainContainer, options);
 	};
 
 	var Carousel = function(element, options){
 		var containers = element.find('.carousel-container');
+		if(isMobile()){
+			console.error('Not support mobile phones in current version');
+			containers.show();
+
+			return;
+		}
 		containers.hide().get(0).show();
 		var LENGTH = containers.size();
 		var CURRENT = 0;	
