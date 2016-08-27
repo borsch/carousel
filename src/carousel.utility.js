@@ -1,7 +1,7 @@
 (function(exports){
 
-	var ANIMATION_TIME = 400;
-	var FRAMES = ANIMATION_TIME / 100;
+	var ANIMATION_TIME = null;
+	var FRAMES = null;
 
 	var WINDOW_WIDTH = window.innerWidth;
 	var WINDTH_HEIGHT = window.innerHeight;
@@ -18,16 +18,22 @@
 	 * @param {string} selector - selector for dom elements(only container required)
 	 * @param {array} [options.animations] - array of animations between containers. contains: 'direction' & 'speed'
 	 * @param {number} [options.numberOfContainers] - number of containers. will init default animations for containers
+	 * @param {number} [options.time] - time for animation
 	 */
 	exports.CarouselInit = function(seletor, options){
-		removeScroll();
+		if(!isMobile()) {
+			removeScroll();
 
-		var mainContainer = new Element(seletor);
-		new Carousel(mainContainer, options);
-	}
+			var mainContainer = new Element(seletor);
+			new Carousel(mainContainer, options);
+		} else {
+			console.error('Not support mobile phones in current version');
+		}
+	};
 
 	var Carousel = function(element, options){
 		var containers = element.find('.carousel-container');
+		containers.hide().get(0).show();
 		var LENGTH = containers.size();
 		var CURRENT = 0;	
 
@@ -35,6 +41,10 @@
 
 		var directions = options.directions || [];
 		var easing = (options.easing && typeof options.easing === 'function' ? options.easing : defaultEasing);
+		
+		var userDeclaredTime = parseInt(options.time);
+		ANIMATION_TIME = (userDeclaredTime > 0 ? userDeclaredTime : 400);
+		FRAMES = ANIMATION_TIME / 100;
 
 		window.onresize = function(){
 			WINDOW_WIDTH = window.innerWidth;
@@ -54,16 +64,11 @@
 		window.onkeydown = function(e){
 			if(!animationInProcess){
 				var code = e.keyCode;
-
-				var newIndex;
-
 				if(code == 40){
-					newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
+					play(true);
 				} else if(code == 38){
-					newIndex = (CURRENT > 0 ? CURRENT-1 : null);
+					play(false);
 				}
-
-				play(newIndex);
 			}
 		}
 
@@ -71,24 +76,29 @@
 			var previousPosition = 0;	
 
 			return function(e){
-				if(!animationInProcess){		
-					var newIndex;
-
+				if(!animationInProcess){
 					var delta = e.deltaY || e.detail || e.wheelDelta;
 					if(delta + previousPosition > previousPosition){
-						newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
-					} else {
-						newIndex = (CURRENT > 0 ? CURRENT-1 : null);
-					}
-					if(newIndex)
+						play(true);
 						previousPosition += delta;
-
-					play(newIndex);
+					} else {
+						play(false);
+						previousPosition += delta;
+					}
 				}
 			}
 		}
 
-		function play(newIndex){
+		function play(next){
+			// if next is 'true' show next container
+			// otherwise show previous
+			var newIndex = null;
+			if(next){
+				newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
+			} else {
+				newIndex = (CURRENT > 0 ? CURRENT-1 : null);
+			}
+
 			if(newIndex != null){
 				var direction;
 				if(newIndex < CURRENT){
@@ -113,8 +123,8 @@
 	};
 
 	function right(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', (-width) + 'px').css('top', '0px'); 
-			oldElem.show().css('left', '0px').css('top', '0px');
+			newElem.default().css('left', (-width) + 'px');
+			oldElem.default();
 			
 			var start = new Date().getTime();
 			
@@ -141,8 +151,8 @@
 		}
 
 		function left(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', (width) + 'px').css('top', '0px'); 
-			oldElem.show().css('left', '0px').css('top', '0px');
+			newElem.default().css('left', (width) + 'px');
+			oldElem.default();
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -167,8 +177,8 @@
 		}
 
 		function down(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', '0px').css('top', height+'px'); 
-			oldElem.show().css('left', '0px');
+			newElem.default().css('top', height+'px'); 
+			oldElem.default();
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -193,8 +203,8 @@
 		}
 
 		function up(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', '0px').css('top', (-height)+'px'); 
-			oldElem.show().css('left', '0px').css('top', '0px');
+			newElem.default().css('top', (-height)+'px'); 
+			oldElem.default();
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -276,9 +286,13 @@
 			},
 			get: function(index){
 				return new Element([elements[index]]);
+			},
+			default: function(){
+				this.show().css('left', '0px').css('top', '0px');
+				return this;
 			}
 		}
-	}
+	};
 
 	function removeScroll(){
 		document.documentElement.style.overflow = 'hidden';  // firefox, chrome
@@ -298,6 +312,18 @@
 			default:
 				return null;
 		}
+	}
+
+	function isMobile() {
+		if (sessionStorage.desktop) // desktop storage
+			return false;
+		else if (localStorage.mobile) // mobile storage
+			return true;
+
+		var mobile = ['iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'windows mobile', 'windows phone', 'iemobile'];
+		for (var i in mobile) if (navigator.userAgent.toLowerCase().indexOf(mobile[i].toLowerCase()) > 0) return true;
+
+		return false;
 	}
 
 })(window);
