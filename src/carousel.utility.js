@@ -21,11 +21,15 @@
 	 * @param {number} [options.time] - time for animation
 	 */
 	exports.CarouselInit = function(seletor, options){
-		removeScroll();
+		if(!isMobile()) {
+			removeScroll();
 
-		var mainContainer = new Element(seletor);
-		new Carousel(mainContainer, options);
-	}
+			var mainContainer = new Element(seletor);
+			new Carousel(mainContainer, options);
+		} else {
+			console.error('Not support mobile phones in current version');
+		}
+	};
 
 	var Carousel = function(element, options){
 		var containers = element.find('.carousel-container');
@@ -288,7 +292,7 @@
 				return this;
 			}
 		}
-	}
+	};
 
 	function removeScroll(){
 		document.documentElement.style.overflow = 'hidden';  // firefox, chrome
@@ -308,6 +312,18 @@
 			default:
 				return null;
 		}
+	}
+
+	function isMobile() {
+		if (sessionStorage.desktop) // desktop storage
+			return false;
+		else if (localStorage.mobile) // mobile storage
+			return true;
+
+		var mobile = ['iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'windows mobile', 'windows phone', 'iemobile'];
+		for (var i in mobile) if (navigator.userAgent.toLowerCase().indexOf(mobile[i].toLowerCase()) > 0) return true;
+
+		return false;
 	}
 
 })(window);
