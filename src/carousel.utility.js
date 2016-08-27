@@ -29,6 +29,7 @@
 
 	var Carousel = function(element, options){
 		var containers = element.find('.carousel-container');
+		containers.hide().get(0).show();
 		var LENGTH = containers.size();
 		var CURRENT = 0;	
 
@@ -118,8 +119,8 @@
 	};
 
 	function right(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', (-width) + 'px').css('top', '0px'); 
-			oldElem.show().css('left', '0px').css('top', '0px');
+			newElem.default().css('left', (-width) + 'px');
+			oldElem.default();
 			
 			var start = new Date().getTime();
 			
@@ -146,8 +147,8 @@
 		}
 
 		function left(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', (width) + 'px').css('top', '0px'); 
-			oldElem.show().css('left', '0px').css('top', '0px');
+			newElem.default().css('left', (width) + 'px');
+			oldElem.default();
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -172,8 +173,8 @@
 		}
 
 		function down(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', '0px').css('top', height+'px'); 
-			oldElem.show().css('left', '0px');
+			newElem.default().css('top', height+'px'); 
+			oldElem.default();
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -198,8 +199,8 @@
 		}
 
 		function up(easing, oldElem, newElem, width, height, time, callback){
-			newElem.show().css('left', '0px').css('top', (-height)+'px'); 
-			oldElem.show().css('left', '0px').css('top', '0px');
+			newElem.default().css('top', (-height)+'px'); 
+			oldElem.default();
 			var start = new Date().getTime();
 			
 			var timer = setInterval(function(){
@@ -281,6 +282,10 @@
 			},
 			get: function(index){
 				return new Element([elements[index]]);
+			},
+			default: function(){
+				this.show().css('left', '0px').css('top', '0px');
+				return this;
 			}
 		}
 	}
