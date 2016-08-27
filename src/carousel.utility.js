@@ -314,23 +314,23 @@
 		}
 	}
 
-	function isMobile() {
-		if (sessionStorage.desktop) // desktop storage
-			return false;
-		else if (localStorage.mobile) // mobile storage
-			return true;
-
-		var mobile = ['iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'windows mobile', 'windows phone', 'iemobile'];
-		for (var i in mobile) {
-			if (navigator.userAgent.toLowerCase().indexOf(mobile[i].toLowerCase()) > 0) {
-				console.log('this is: ' + mobile[i]);
-				return true;
-			}
-		}
-		console.log('this is desktop');
-
-
-		return false;
-	}
-
 })(window);
+
+function isMobile() {
+	if (sessionStorage.desktop) // desktop storage
+		return false;
+	else if (localStorage.mobile) // mobile storage
+		return true;
+
+	var mobile = ['iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'windows mobile', 'windows phone', 'iemobile'];
+	for (var i in mobile) {
+		if (navigator.userAgent.toLowerCase().indexOf(mobile[i].toLowerCase()) > 0) {
+			console.log('this is: ' + mobile[i]);
+			return true;
+		}
+	}
+	console.log('this is desktop');
+
+
+	return false;
+}
