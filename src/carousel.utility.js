@@ -21,8 +21,6 @@
 	 * @param {number} [options.time] - time for animation
 	 */
 	exports.CarouselInit = function(seletor, options){
-		removeScroll();
-
 		var mainContainer = new Element(seletor);
 		new Carousel(mainContainer, options);
 	};
@@ -32,9 +30,11 @@
 		if(isMobile()){
 			console.error('Not support mobile phones in current version');
 			containers.show();
+			containers.removeClass('carousel-container');
 
 			return;
 		}
+		removeScroll();
 		containers.hide().get(0).show();
 		var LENGTH = containers.size();
 		var CURRENT = 0;	
@@ -292,6 +292,11 @@
 			default: function(){
 				this.show().css('left', '0px').css('top', '0px');
 				return this;
+			},
+			removeClass: function(className){
+				this.each(function(element){
+					element.className = element.className.replace(className, '');
+				});
 			}
 		}
 	};
