@@ -54,16 +54,11 @@
 		window.onkeydown = function(e){
 			if(!animationInProcess){
 				var code = e.keyCode;
-
-				var newIndex;
-
 				if(code == 40){
-					newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
+					play(true);
 				} else if(code == 38){
-					newIndex = (CURRENT > 0 ? CURRENT-1 : null);
+					play(false);
 				}
-
-				play(newIndex);
 			}
 		}
 
@@ -71,24 +66,29 @@
 			var previousPosition = 0;	
 
 			return function(e){
-				if(!animationInProcess){		
-					var newIndex;
-
+				if(!animationInProcess){
 					var delta = e.deltaY || e.detail || e.wheelDelta;
 					if(delta + previousPosition > previousPosition){
-						newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
-					} else {
-						newIndex = (CURRENT > 0 ? CURRENT-1 : null);
-					}
-					if(newIndex)
+						play(true);
 						previousPosition += delta;
-
-					play(newIndex);
+					} else {
+						play(false);
+						previousPosition += delta;
+					}
 				}
 			}
 		}
 
-		function play(newIndex){
+		function play(next){
+			// if next is 'true' show next container
+			// otherwise show previous
+			var newIndex = null;
+			if(next){
+				newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
+			} else {
+				newIndex = (CURRENT > 0 ? CURRENT-1 : null);
+			}
+
 			if(newIndex != null){
 				var direction;
 				if(newIndex < CURRENT){
