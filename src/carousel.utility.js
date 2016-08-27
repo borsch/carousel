@@ -1,7 +1,7 @@
 (function(exports){
 
-	var ANIMATION_TIME = 400;
-	var FRAMES = ANIMATION_TIME / 100;
+	var ANIMATION_TIME = null;
+	var FRAMES = null;
 
 	var WINDOW_WIDTH = window.innerWidth;
 	var WINDTH_HEIGHT = window.innerHeight;
@@ -18,6 +18,7 @@
 	 * @param {string} selector - selector for dom elements(only container required)
 	 * @param {array} [options.animations] - array of animations between containers. contains: 'direction' & 'speed'
 	 * @param {number} [options.numberOfContainers] - number of containers. will init default animations for containers
+	 * @param {number} [options.time] - time for animation
 	 */
 	exports.CarouselInit = function(seletor, options){
 		removeScroll();
@@ -35,6 +36,10 @@
 
 		var directions = options.directions || [];
 		var easing = (options.easing && typeof options.easing === 'function' ? options.easing : defaultEasing);
+		
+		var userDeclaredTime = parseInt(options.time);
+		ANIMATION_TIME = (userDeclaredTime > 0 ? userDeclaredTime : 400);
+		FRAMES = ANIMATION_TIME / 100;
 
 		window.onresize = function(){
 			WINDOW_WIDTH = window.innerWidth;
