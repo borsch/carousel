@@ -36,12 +36,17 @@
 		}
 		removeScroll();
 		containers.hide().get(0).show();
-		var LENGTH = containers.size();
 		var CURRENT = 0;	
-
+        var length = containers.size();
 		options = options || {};
 
 		var directions = options.directions || [];
+		if (directions.length < length - 1) {
+		    for (var i = directions.length; i < length - 1; ++i) {
+		        directions.push('down');
+            }
+        }
+
 		var easing = (options.easing && typeof options.easing === 'function' ? options.easing : defaultEasing);
 		
 		var userDeclaredTime = parseInt(options.time);
@@ -72,7 +77,7 @@
 					play(false);
 				}
 			}
-		}
+		};
 
 		function MouseWheelHandler(){
 			var previousPosition = 0;	
@@ -104,8 +109,8 @@
 			if(newIndex != null){
 				var direction;
 				if(newIndex < CURRENT){
-					var oposite = opositDirection(directions[newIndex])
-					direction = (DIRECTIONS[oposite] ? oposite : 'down');
+					var opposite = oppositeDirection(directions[newIndex]);
+					direction = (DIRECTIONS[opposite] ? opposite : 'down');
 				} else {
 					direction = (DIRECTIONS[directions[CURRENT]] ? directions[CURRENT] : 'up');
 				}
@@ -254,14 +259,14 @@
 				}
 			},
 			find: function(selector){
-				var childrens = [];
-				this.each(function(element, index){
-					var currentElementChildrens = element.querySelectorAll(selector);
-					currentElementChildrens.forEach(function(e){
-						childrens.push(e);
+				var children = [];
+				this.each(function(element){
+					var currentElementChildren = element.querySelectorAll(selector);
+					currentElementChildren.forEach(function(e){
+                        children.push(e);
 					});
 				});
-				return new Element(childrens);
+				return new Element(children);
 			},
 			/**
 			 *
@@ -306,7 +311,7 @@
     	document.body.scroll = "no"; // ie only
 	}
 
-	function opositDirection(direction){
+	function oppositeDirection(direction){
 		switch(direction){
 			case 'up':
 				return 'down';
@@ -321,20 +326,19 @@
 		}
 	}
 
-	exports.isMobile = function() {
+	function isMobile() {
 		if (sessionStorage.desktop) // desktop storage
 			return false;
 		else if (localStorage.mobile) // mobile storage
 			return true;
 
 		var mobile = ['iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'windows mobile', 'windows phone', 'iemobile'];
-		for (var i in mobile) {
-			if (navigator.userAgent.toLowerCase().indexOf(mobile[i].toLowerCase()) > 0) {
-				console.log('this is: ' + mobile[i]);
+		var currentAgent = navigator.userAgent.toLowerCase();
+		for (var i = 0; i < mobile.length; ++i) {
+			if (currentAgent.indexOf(mobile[i].toLowerCase()) > 0) {
 				return true;
 			}
 		}
-		console.log('this is: desktop');
 
 		return false;
 	}
