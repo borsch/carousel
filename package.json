@@ -1,0 +1,31 @@
+{
+  "name": "carousel",
+  "version": "1.0.0",
+  "description": "tiny unit to make your landing page perfect",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borsch/carousel.git"
+  },
+  "keywords": [
+    "carousel",
+    "gallery",
+    "landing-page"
+  ],
+  "author": "Oleh Kurpiak",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/borsch/carousel/issues"
+  },
+  "homepage": "https://github.com/borsch/carousel#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-uglyfly": "^1.4.2"
+  }
+}
