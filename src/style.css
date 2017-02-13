@@ -8,6 +8,7 @@
 * {
     color: white;
     font-family: Jura;
+    text-align: center;
 }
 
 .carousel-container:nth-child(5n+1) {
@@ -26,8 +27,41 @@
     background-color: #ba9077;
 }
 
+.carousel-container {
+    padding-top: 100px;
+}
+
 .title {
-    margin: 0 auto;
-    top: 30%;
     font-size: 50px;
+}
+
+.description {
+    font-size: 30px;
+    margin-top: 30px;
+}
+
+.static-description {
+    position: absolute;
+    bottom: 30px;
+    right: 80px;
+    text-align: left;
+    z-index: 10;
+}
+
+ul {
+    list-style-type: none;
+    font-size: 25px;
+}
+li {
+    margin-bottom: 20px;
+}
+
+.pros-description {
+    font-size: 20px;
+}
+
+code {
+    text-align: justify;
+    font-size: small;
+    font-family: Arial;
 }
