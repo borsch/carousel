@@ -192,7 +192,6 @@
             _frames = _self._frames,
             _time = _self._animationTime,
             _timer = setInterval(function(){
-                console.log(_easing);
 			    // difference in time from last call in percents
                 var diff = (new Date().getTime() - start) / _time;
 
