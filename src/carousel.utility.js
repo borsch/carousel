@@ -1,239 +1,283 @@
 (function(exports){
 
-	var ANIMATION_TIME = null;
-	var FRAMES = null;
+	const CONTAINERS_SELECTOR = '.carousel-container';
+	const FRAMES_PER_ANIMATION = 100;
+	const DEFAULT_ANIMATION_TIME = 400;
 
 	var WINDOW_WIDTH = window.innerWidth;
-	var WINDTH_HEIGHT = window.innerHeight;
-
-	var DIRECTIONS = {
-		left: left,
-		right: right,
-		up: up,
-		down: down
-	};
+	var WINDOW_HEIGHT = window.innerHeight;
 
 	/**
 	 *
-	 * @param {string} selector - selector for dom elements(only container required)
-	 * @param {array} [options.animations] - array of animations between containers. contains: 'direction' & 'speed'
-	 * @param {number} [options.numberOfContainers] - number of containers. will init default animations for containers
-	 * @param {number} [options.time] - time for animation
+	 * @param {String} selector - selector for dom elements(only container required)
+     * @param {Object} [options] - optional options for carousel
+	 * @param {Number} [options.time] - time for animation
+     * @param {Array} [options.direction] - array of directions that declares how to change containers(animation)
+     * @param {Function} [options.easing] - function for animation steps
 	 */
-	exports.CarouselInit = function(seletor, options){
-		var mainContainer = new Element(seletor);
+	exports.CarouselInit = function(selector, options){
+		var mainContainer = new Element(selector);
 		new Carousel(mainContainer, options);
 	};
 
 	var Carousel = function(element, options){
-		var containers = element.find('.carousel-container');
+		this._containers = element.find(CONTAINERS_SELECTOR);
+		this._options = options || {};
+
 		if(isMobile()){
-			console.error('Not support mobile phones in current version');
-			containers.show();
-			containers.removeClass('carousel-container');
+			this.mobileInit();
 
 			return;
 		}
-		removeScroll();
-		containers.hide().get(0).show();
-		var CURRENT = 0;	
-        var length = containers.size();
-		options = options || {};
 
-		var directions = options.directions || [];
-		if (directions.length < length - 1) {
-		    for (var i = directions.length; i < length - 1; ++i) {
-		        directions.push('down');
-            }
-        }
-
-		var easing = (options.easing && typeof options.easing === 'function' ? options.easing : defaultEasing);
-		
-		var userDeclaredTime = parseInt(options.time);
-		ANIMATION_TIME = (userDeclaredTime > 0 ? userDeclaredTime : 400);
-		FRAMES = ANIMATION_TIME / 100;
-
-		window.onresize = function(){
-			WINDOW_WIDTH = window.innerWidth;
-			WINDTH_HEIGHT = window.innerHeight;
-		};
-
-		if (window.addEventListener) {
-			// IE9, Chrome, Safari, Opera
-			window.addEventListener("mousewheel", MouseWheelHandler(), false);
-			// Firefox
-			window.addEventListener("DOMMouseScroll", MouseWheelHandler(), false);
-		} else {
-			// IE 6/7/8
-			window.attachEvent("onmousewheel", MouseWheelHandler());
-		}
-		var animationInProcess = false;
-		window.onkeydown = function(e){
-			if(!animationInProcess){
-				var code = e.keyCode;
-				if(code == 40){
-					play(true);
-				} else if(code == 38){
-					play(false);
-				}
-			}
-		};
-
-		function MouseWheelHandler(){
-			var previousPosition = 0;	
-
-			return function(e){
-				if(!animationInProcess){
-					var delta = e.deltaY || e.detail || e.wheelDelta;
-					if(delta + previousPosition > previousPosition){
-						play(true);
-						previousPosition += delta;
-					} else {
-						play(false);
-						previousPosition += delta;
-					}
-				}
-			}
-		}
-
-		function play(next){
-			// if next is 'true' show next container
-			// otherwise show previous
-			var newIndex = null;
-			if(next){
-				newIndex = (CURRENT+1 < containers.size() ? CURRENT+1 : null);
-			} else {
-				newIndex = (CURRENT > 0 ? CURRENT-1 : null);
-			}
-
-			if(newIndex != null){
-				var direction;
-				if(newIndex < CURRENT){
-					var opposite = oppositeDirection(directions[newIndex]);
-					direction = (DIRECTIONS[opposite] ? opposite : 'down');
-				} else {
-					direction = (DIRECTIONS[directions[CURRENT]] ? directions[CURRENT] : 'up');
-				}
-
-				animationInProcess = true;
-				var oldElem = containers.get(CURRENT);
-				var newElem = containers.get(newIndex);
-				CURRENT = newIndex;
-				DIRECTIONS[direction](easing, oldElem, newElem, WINDOW_WIDTH, WINDTH_HEIGHT, ANIMATION_TIME, function(){
-					animationInProcess = false;
-					oldElem.hide();
-				});
-			} else {
-				animationInProcess = false;
-			}
-		}
+		this.init();
+		this.addListeners();
 	};
 
-	function right(easing, oldElem, newElem, width, height, time, callback){
-			newElem.default().css('left', (-width) + 'px');
-			oldElem.default();
-			
-			var start = new Date().getTime();
-			
-			var timer = setInterval(function(){
-				// difference in time from last call in percents
-				var diff = (new Date().getTime() - start) / time;
+	Carousel.prototype.mobileInit = function() {
+		var _c = this._containers;
 
-				// calculate position in persents based on time difference
-				var result = easing(diff);
+        console.error('Not support mobile phones in current version');
 
-				var oldElemPosition = result*width;
-				var newElemPosition = oldElemPosition - width;
-				
-				newElem.css('left', newElemPosition + 'px');
-				oldElem.css('left', oldElemPosition + 'px');
-				
-				if(result > 0.99){
-					newElem.css('left', '0px');
-					oldElem.css('left', width + 'px');
-					clearInterval(timer);
-					callback();
-				}
-			}, FRAMES);
-		}
+        _c.show();
+        _c.removeClass('carousel-container');
+	};
 
-		function left(easing, oldElem, newElem, width, height, time, callback){
-			newElem.default().css('left', (width) + 'px');
-			oldElem.default();
-			var start = new Date().getTime();
-			
-			var timer = setInterval(function(){
-				// difference in time from last call in percents
-				var diff = (new Date().getTime() - start) / time;
+	Carousel.prototype.init = function() {
+        removeScroll();
 
-				// calculate position in persents based on time difference
-				var result = easing(diff);
-				
-				var oldElemPosition = -width*result;
-				var newElemPosition = oldElemPosition + width;
-				newElem.css('left', newElemPosition + 'px');
-				oldElem.css('left', oldElemPosition + 'px');
-				
-				if(result > 0.99){
-					oldElem.css('left', (-width)+'px');
-					newElem.css('left', '0px');
-					clearInterval(timer);
-					callback();
-				}
-			}, FRAMES);
-		}
+        var _c = this._containers,
+			_o = this._options,
+			_d = this._options.directions = _o.directions || [];
+        this._current = 0;
+        this._easing = (_o.easing && typeof _o.easing === 'function' ? _o.easing : defaultEasing);
 
-		function down(easing, oldElem, newElem, width, height, time, callback){
-			newElem.default().css('top', height+'px'); 
-			oldElem.default();
-			var start = new Date().getTime();
-			
-			var timer = setInterval(function(){
-				// difference in time from last call in percents
-				var diff = (new Date().getTime() - start) / time;
+        var userDeclaredTime = parseInt(_o.time);
+        this._animationTime = (userDeclaredTime > 0 ? userDeclaredTime : DEFAULT_ANIMATION_TIME);
+        this._frames = this._animationTime / FRAMES_PER_ANIMATION;
 
-				// calculate position in persents based on time difference
-				var result = easing(diff);
-				
-				var oldElemPosition = -height*result;
-				var newElemPosition = oldElemPosition + height;
-				newElem.css('top', newElemPosition + 'px');
-				oldElem.css('top', oldElemPosition + 'px');
-				
-				if(result > 0.99){
-					oldElem.css('top', (-height)+'px');
-					newElem.css('top', '0px');
-					clearInterval(timer);
-					callback();
-				}
-			}, FRAMES);
-		}
 
-		function up(easing, oldElem, newElem, width, height, time, callback){
-			newElem.default().css('top', (-height)+'px'); 
-			oldElem.default();
-			var start = new Date().getTime();
-			
-			var timer = setInterval(function(){
-				// difference in time from last call in percents
-				var diff = (new Date().getTime() - start) / time;
+        _c.hide().get(0).show();
 
-				// calculate position in persents based on time difference
-				var result = easing(diff);
-				
-				var oldElemPosition = height*result;
-				var newElemPosition = oldElemPosition - height;
-				newElem.css('top', newElemPosition + 'px');
-				oldElem.css('top', oldElemPosition + 'px');
-				
-				if(result > 0.99){
-					oldElem.css('top', (-height)+'px');
-					newElem.css('top', '0px');
-					clearInterval(timer);
-					callback();
-				}
-			}, FRAMES);
-		}
+        var length = _c.size();
+        if (_d.length < length - 1) {
+            for (var i = _d.length; i < length - 1; ++i) {
+                _d.push('down');
+            }
+        }
+	};
+
+	Carousel.prototype.addListeners = function() {
+	    var _self = this;
+	    _self._animationInProcess = false;
+
+        window.onresize = function(){
+            WINDOW_WIDTH = window.innerWidth;
+            WINDOW_HEIGHT = window.innerHeight;
+        };
+
+        if (window.addEventListener) {
+            // IE9, Chrome, Safari, Opera
+            window.addEventListener("mousewheel", MouseWheelHandler(), false);
+            // Firefox
+            window.addEventListener("DOMMouseScroll", MouseWheelHandler(), false);
+        } else {
+            // IE 6/7/8
+            window.attachEvent("onmousewheel", MouseWheelHandler());
+        }
+        window.onkeydown = function(e){
+            if(! _self._animationInProcess){
+                var code = e.keyCode;
+                if(code == 40){
+                    _self._play(true);
+                } else if(code == 38){
+                    _self._play(false);
+                }
+            }
+        };
+
+        function MouseWheelHandler(){
+            var previousPosition = 0;
+
+            return function(e){
+                if(! _self._animationInProcess){
+                    var delta = e.deltaY || e.detail || e.wheelDelta;
+                    if(delta + previousPosition > previousPosition){
+                        _self._play(true);
+                        previousPosition += delta;
+                    } else {
+                        _self._play(false);
+                        previousPosition += delta;
+                    }
+                }
+            }
+        }
+    };
+
+	Carousel.prototype._play = function(next) {
+	    var _self = this,
+            _current = _self._current,
+            _containers = _self._containers,
+            _directions = _self._options.directions;
+
+
+        // if next is 'true' show next container
+        // otherwise show previous
+        var newIndex = null;
+        if(next){
+            newIndex = (_current+1 < _containers.size() ? _current+1 : null);
+        } else {
+            newIndex = (_current > 0 ? _current-1 : null);
+        }
+
+        if(newIndex != null){
+            var direction;
+            if(newIndex < _current){
+                var opposite = oppositeDirection(_directions[newIndex]);
+                direction = (DIRECTIONS[opposite] ? opposite : 'down');
+            } else {
+                direction = (DIRECTIONS[_directions[_current]] ? _directions[_current] : 'up');
+            }
+
+            _self._animationInProcess = true;
+            var oldElem = _containers.get(_current);
+            var newElem = _containers.get(newIndex);
+            _self._current = newIndex;
+
+            this['_' + direction] (oldElem, newElem);
+        } else {
+            _self._animationInProcess = false;
+        }
+    };
+
+	Carousel.prototype._right = function(oldElem, newElem){
+		newElem.default().css('left', (-WINDOW_WIDTH) + 'px');
+		oldElem.default();
+
+		var start = new Date().getTime(),
+            _self = this,
+            _easing = _self._easing,
+            _frames = _self._frames,
+            _time = _self._animationTime,
+            _timer = setInterval(function(){
+                // difference in time from last call in percents
+                var diff = (new Date().getTime() - start) / _time;
+
+                // calculate position in persents based on time difference
+                var result = _easing(diff);
+
+                var oldElemPosition = result * WINDOW_WIDTH;
+                var newElemPosition = oldElemPosition - WINDOW_WIDTH;
+
+                newElem.css('left', newElemPosition + 'px');
+                oldElem.css('left', oldElemPosition + 'px');
+
+                if(result > 0.99){
+                    newElem.css('left', '0px');
+                    oldElem.css('left', WINDOW_WIDTH + 'px');
+                    clearInterval(_timer);
+                    _self._animationInProcess = false;
+                    oldElem.hide();
+                }
+		}, _frames);
+	};
+
+	Carousel.prototype._left = function(oldElem, newElem){
+		newElem.default().css('left', (WINDOW_WIDTH) + 'px');
+		oldElem.default();
+
+		var start = new Date().getTime(),
+            _self = this,
+            _easing = _self._easing,
+            _frames = _self._frames,
+            _time = _self._animationTime,
+            _timer = setInterval(function(){
+                console.log(_easing);
+			    // difference in time from last call in percents
+                var diff = (new Date().getTime() - start) / _time;
+
+                // calculate position in persents based on time difference
+                var result = _easing(diff);
+
+                var oldElemPosition = -WINDOW_WIDTH*result;
+                var newElemPosition = oldElemPosition + WINDOW_WIDTH;
+
+                newElem.css('left', newElemPosition + 'px');
+                oldElem.css('left', oldElemPosition + 'px');
+
+                if(result > 0.99){
+                    oldElem.css('left', (-WINDOW_WIDTH)+'px');
+                    newElem.css('left', '0px');
+                    clearInterval(_timer);
+                    _self._animationInProcess = false;
+                    oldElem.hide();
+                }
+		}, _frames);
+	};
+
+	Carousel.prototype._down = function(oldElem, newElem){
+		newElem.default().css('top', WINDOW_HEIGHT+'px');
+		oldElem.default();
+
+		var start = new Date().getTime(),
+            _self = this,
+            _easing = _self._easing,
+            _frames = _self._frames,
+            _time = _self._animationTime,
+            _timer = setInterval(function(){
+                // difference in time from last call in percents
+                var diff = (new Date().getTime() - start) / _time;
+
+                // calculate position in persents based on time difference
+                var result = _easing(diff);
+
+                var oldElemPosition = -WINDOW_HEIGHT * result;
+                var newElemPosition = oldElemPosition + WINDOW_HEIGHT;
+
+                newElem.css('top', newElemPosition + 'px');
+                oldElem.css('top', oldElemPosition + 'px');
+
+                if(result > 0.99){
+                    oldElem.css('top', (-WINDOW_HEIGHT)+'px');
+                    newElem.css('top', '0px');
+                    clearInterval(_timer);
+                    _self._animationInProcess = false;
+                    oldElem.hide();
+                }
+		}, _frames);
+	};
+
+	Carousel.prototype._up = function(oldElem, newElem){
+		newElem.default().css('top', (-WINDOW_HEIGHT)+'px');
+		oldElem.default();
+
+		var start = new Date().getTime(),
+            _self = this,
+            _easing = _self._easing,
+            _frames = _self._frames,
+            _time = _self._animationTime,
+            _timer = setInterval(function(){
+                // difference in time from last call in percents
+                var diff = (new Date().getTime() - start) / _time;
+
+                // calculate position in persents based on time difference
+                var result = _easing(diff);
+
+                var oldElemPosition = WINDOW_HEIGHT * result;
+                var newElemPosition = oldElemPosition - WINDOW_HEIGHT;
+
+                newElem.css('top', newElemPosition + 'px');
+                oldElem.css('top', oldElemPosition + 'px');
+
+                if(result > 0.99){
+                    oldElem.css('top', (-WINDOW_HEIGHT)+'px');
+                    newElem.css('top', '0px');
+                    clearInterval(_timer);
+                    _self._animationInProcess = false;
+                    oldElem.hide();
+                }
+		}, _frames);
+	};
 
 	function defaultEasing(value){
 		return 1 - Math.cos(value);
@@ -249,14 +293,11 @@
 
 		return {
 			css: function(prop, value){
-				if(value){
-					elements.forEach(function(elem){
-						elem.style[prop] = value;
-					});
-					return this;
-				} else {
-					return elements[0] ? elements[0].style[prop] : null;
-				}
+			    for (var i = 0; i < elements.length; ++i) {
+			        elements[i].style[prop] = value;
+                }
+
+				return this;
 			},
 			find: function(selector){
 				var children = [];
@@ -268,12 +309,7 @@
 				});
 				return new Element(children);
 			},
-			/**
-			 *
-			 * @param {function} callback - function for each element in DOM elements of object
-			 */
 			each: function(callback){
-				callback = callback || function(){};
 				elements.forEach(callback);
 			},
 			size: function(){
@@ -287,7 +323,7 @@
 			},
 			hide: function(){
 				this.each(function(element){
-					element.style.display = 'none';
+                    element.style.display = 'none';
 				});
 				return this;
 			},
@@ -334,6 +370,7 @@
 
 		var mobile = ['iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'windows mobile', 'windows phone', 'iemobile'];
 		var currentAgent = navigator.userAgent.toLowerCase();
+
 		for (var i = 0; i < mobile.length; ++i) {
 			if (currentAgent.indexOf(mobile[i].toLowerCase()) > 0) {
 				return true;
@@ -342,5 +379,12 @@
 
 		return false;
 	}
+
+    var DIRECTIONS = {
+        left: 'left',
+        right: 'right',
+        up: 'up',
+        down: 'down'
+    };
 
 })(window);
