@@ -56,7 +56,6 @@
         this._animationTime = (userDeclaredTime > 0 ? userDeclaredTime : DEFAULT_ANIMATION_TIME);
         this._frames = this._animationTime / FRAMES_PER_ANIMATION;
 
-
         _c.hide().get(0).show();
 
         var length = _c.size();
@@ -99,9 +98,14 @@
         function MouseWheelHandler(){
             var previousPosition = 0;
 
+            var ie = isIE();
+
             return function(e){
                 if(! _self._animationInProcess){
                     var delta = e.deltaY || e.detail || e.wheelDelta;
+                    if (ie) {
+                        delta = -delta;
+                    }
                     if(delta + previousPosition > previousPosition){
                         _self._play(true);
                         previousPosition += delta;
@@ -302,14 +306,16 @@
 				var children = [];
 				this.each(function(element){
 					var currentElementChildren = element.querySelectorAll(selector);
-					currentElementChildren.forEach(function(e){
-                        children.push(e);
-					});
+					for (var i = 0; i < currentElementChildren.length; ++i) {
+						children.push(currentElementChildren[i]);
+					}
 				});
 				return new Element(children);
 			},
 			each: function(callback){
-				elements.forEach(callback);
+				for (var i = 0; i < elements.length; ++i) {
+					callback(elements[i], i, elements);
+				}
 			},
 			size: function(){
 				return elements.length;
@@ -368,7 +374,7 @@
 			return true;
 
 		var mobile = ['iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'windows mobile', 'windows phone', 'iemobile'];
-		var currentAgent = navigator.userAgent.toLowerCase();
+		var currentAgent = agent();
 
 		for (var i = 0; i < mobile.length; ++i) {
 			if (currentAgent.indexOf(mobile[i].toLowerCase()) > 0) {
@@ -378,6 +384,14 @@
 
 		return false;
 	}
+
+	function isIE() {
+	    return agent().indexOf('.net') > -1;
+    }
+
+    function agent() {
+	    return navigator.userAgent.toLowerCase();
+    }
 
     var DIRECTIONS = {
         left: 'left',
