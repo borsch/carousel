@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Carousel</title>
+</head>
+<body>
+    <div class="carousel-main-container">
+        <div class="carousel-container">
+            <h2 class="title">Carousel</h2>
+            <div class="description">
+                The most intelligent library for carousels
+                <br />
+                Just scroll to see the effect
+            </div>
+        </div>
+        <div class="carousel-container">
+            <h2 class="title">Why use this library?</h2>
+            <div class="description">
+                <ul>
+                    <li>
+                        <i class="fa fa-check"></i> simple
+                        <br />
+                        <span class="pros-description">install it, add CarouselInit(your_selector), and that's all. what can be easiest?</span>
+                    </li>
+                    <li>
+                        <i class="fa fa-check"></i> lightweight
+                        <br />
+                        <span class="pros-description">release file weight is just 4.52 KB</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <h2 class="title">Sample</h2>
+            <div class="description">
+                <pre>
+                    <code class="js" id="js_sample">
+                        CarouselInit(selector, {
+                            directions: [
+                                'left',
+                                'down',
+                                'right',
+                                'down'
+                            ],
+                            easing: Math.sin,
+                            time: 500
+                        });
+                        // selector - your html block element
+                        // direction[optional] - array with directions for animation(by default will produced array with 'down' options)
+                        // easing[optional] - function that return value in [0, 1] interval
+                        // tile[optional] - time for animation(change slides)
+                    </code>
+                </pre>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <h2 class="title">Info</h2>
+            <div class="description">
+                github: <a href="https://github.com/borsch/carousel" target="_blank">repository</a>
+                <br />
+                contact with me <a href="mailto:oleh.kurpiak@gmail.com" target="_blank">oleh.kurpiak@gmail.com</a>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <h2 class="title">This page immediately left blank</h2>
+            <div class="description">
+                just for sample of scrolling
+            </div>
+        </div>
+        <div class="carousel-container">
+            <h2 class="title">This page immediately left blank</h2>
+            <div class="description">
+                just for sample of scrolling
+            </div>
+        </div>
+    </div>
+
+    <div class="static-description">
+        &copy; made by borsch
+        <br />
+        Oleh Kurpiak
+    </div>
+
+    <link rel="stylesheet" type="text/css" href="sample_deps/highlight/zenburn.css" />
+    <link rel="stylesheet" type="text/css" href="src/carousel.css" />
+    <link rel="stylesheet" type="text/css" href="sample_deps/style.css" />
+    <link rel="stylesheet" type="text/css" href="sample_deps/font_awesome/css/font-awesome.min.css" />
+    <script src="sample_deps/highlight/highlight.pack.js"></script>
+    <script src="src/carousel.utility.js"></script>
+    <script src="sample_deps/main.js"></script>
+</body>
+</html>
