@@ -56,9 +56,33 @@
         <div class="carousel-container">
             <h2 class="title">Info</h2>
             <div class="description">
-                github: <a href="https://github.com/borsch/carousel" target="_blank">repository</a>
+                github <a href="https://github.com/borsch/carousel" target="_blank">repository</a>
                 <br />
                 contact with me <a href="mailto:oleh.kurpiak@gmail.com" target="_blank">oleh.kurpiak@gmail.com</a>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <h2 class="title">Other easing function sample</h2>
+            <div class="description">
+                <pre>
+                    <code class="js" id="easing">
+                        <a href="#linear" class="easing">linear</a>: function (t) { return t }
+                        // accelerating from zero velocity
+                        <a href="#easeInQuad" class="easing">easeInQuad</a>: function (t) { return t*t }
+                        // decelerating to zero velocity
+                        <a href="#easeOutQuad" class="easing">easeOutQuad</a>: function (t) { return t*(2-t) }
+                        // acceleration until halfway, then deceleration
+                        <a href="#easeInOutQuad" class="easing">easeInOutQuad</a>: function (t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t }
+                        // accelerating from zero velocity
+                        <a href="#easeInCubic" class="easing">easeInCubic</a>: function (t) { return t*t*t }
+                        // decelerating to zero velocity
+                        <a href="#easeOutCubic" class="easing">easeOutCubic</a>: function (t) { return (--t)*t*t+1 }
+                        // acceleration until halfway, then deceleration
+                        <a href="#easeInOutCubic" class="easing">easeInOutCubic</a>: function (t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 }
+                        // accelerating from zero velocity
+                        <a href="#easeInQuart" class="easing">easeInQuart</a>: function (t) { return t*t*t*t }
+                    </code>
+                </pre>
             </div>
         </div>
         <div class="carousel-container">
@@ -81,12 +105,13 @@
         Oleh Kurpiak
     </div>
 
-    <link rel="stylesheet" type="text/css" href="src/highlight/zenburn.css" />
-    <link rel="stylesheet" type="text/css" href="src/carousel.min.css" />
-    <link rel="stylesheet" type="text/css" href="src/style.css" />
-    <link rel="stylesheet" type="text/css" href="src/font_awesome/css/font-awesome.min.css" />
-    <script src="src/highlight/highlight.pack.js"></script>
-    <script src="src/carousel.min.js"></script>
-    <script src="src/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="sample_deps/highlight/zenburn.css" />
+    <link rel="stylesheet" type="text/css" href="src/carousel.css" />
+    <link rel="stylesheet" type="text/css" href="sample_deps/style.css" />
+    <link rel="stylesheet" type="text/css" href="sample_deps/font_awesome/css/font-awesome.min.css" />
+    <script src="sample_deps/highlight/highlight.pack.js"></script>
+    <script src="src/carousel.utility.js"></script>
+    <script src="sample_deps/easing.js"></script>
+    <script src="sample_deps/main.js"></script>
 </body>
 </html>
