@@ -10,10 +10,10 @@ CarouselInit('.carousel-main-container', {
     directions: [
         'left',
         'down',
-        'right',
-        'down'
+        'right'
     ],
     easing: easing,
+    circle: true,
     time: 500
 });
 
