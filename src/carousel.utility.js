@@ -14,6 +14,7 @@
 	 * @param {Number} [options.time] - time for animation
      * @param {Array} [options.direction] - array of directions that declares how to change containers(animation)
      * @param {Function} [options.easing] - function for animation steps
+	 * @param {Boolean}  [options.circle] - allow move carousel in circle
 	 */
 	exports.CarouselInit = function(selector, options){
 		var mainContainer = new Element(selector);
@@ -51,6 +52,7 @@
 			_d = this._options.directions = _o.directions || [];
         this._current = 0;
         this._easing = (_o.easing && typeof _o.easing === 'function' ? _o.easing : defaultEasing);
+        this._circle = !!this._options.circle;
 
         var userDeclaredTime = parseInt(_o.time);
         this._animationTime = (userDeclaredTime > 0 ? userDeclaredTime : DEFAULT_ANIMATION_TIME);
@@ -60,7 +62,7 @@
 
         var length = _c.size();
         if (_d.length < length - 1) {
-            for (var i = _d.length; i < length - 1; ++i) {
+            for (var i = _d.length; i < length; ++i) {
                 _d.push('down');
             }
         }
@@ -122,26 +124,35 @@
 	    var _self = this,
             _current = _self._current,
             _containers = _self._containers,
-            _directions = _self._options.directions;
+            _directions = _self._options.directions,
+			_circle = _self._circle,
+			_len = _containers.size();
 
 
         // if next is 'true' show next container
         // otherwise show previous
         var newIndex = null;
-        if(next){
-            newIndex = (_current+1 < _containers.size() ? _current+1 : null);
+        if (next) {
+            newIndex = (_current + 1 < _len ? _current + 1 : (_circle ? 0 : null));
         } else {
-            newIndex = (_current > 0 ? _current-1 : null);
+            newIndex = (_current > 0 ? _current - 1 : (_circle ? _len - 1 : null));
         }
 
         if(newIndex != null){
             var direction;
             if(newIndex < _current){
-                var opposite = oppositeDirection(_directions[newIndex]);
-                direction = (DIRECTIONS[opposite] ? opposite : 'down');
+                direction = oppositeDirection(_directions[newIndex]);
             } else {
-                direction = (DIRECTIONS[_directions[_current]] ? _directions[_current] : 'up');
+                direction = _directions[_current]
             }
+
+            if (_circle) {
+            	if (newIndex == 0 && _current == _len - 1) {
+                    direction = _directions[_current]
+				} else if (newIndex == _len - 1 && _current == 0) {
+                    direction = oppositeDirection(_directions[newIndex]);
+				}
+			}
 
             _self._animationInProcess = true;
             var oldElem = _containers.get(_current);
@@ -392,12 +403,5 @@
     function agent() {
 	    return navigator.userAgent.toLowerCase();
     }
-
-    var DIRECTIONS = {
-        left: 'left',
-        right: 'right',
-        up: 'up',
-        down: 'down'
-    };
 
 })(window);
