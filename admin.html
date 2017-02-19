@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analitics</title>
+</head>
+<body>
+<div id="unique_page_views">
+
+</div>
+<script src="sample_deps/keen/keen.min.js"></script>
+<script type="text/javascript">
+    var client = new Keen({
+        projectId: "58a990978db53dfda8a882ef",
+        readKey: "B4A293B1E846C18FB57CA07D2561D36E05E912AD989A460315FE4403BC9880C9"
+    });
+
+    document.getElementById('unique_page_views').innerText = 'fetching query';
+
+    Keen.ready(function(){
+        var query = new Keen.Query("count_unique", {
+            event_collection: "pageviews",
+            timeframe: "this_14_days",
+            timezone: "UTC",
+            target_property: 'ip_address'
+        });
+
+        client.run(query, function(err, res){
+            if (res) {
+                document.getElementById('unique_page_views').innerText = 'unique page views: ' + res.result;
+            } else {
+                document.getElementById('unique_page_views').innerHTML = 'error<br/>' + err.toString();
+            }
+        });
+    });
+</script>
+</body>
+</html>

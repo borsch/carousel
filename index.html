@@ -144,8 +144,7 @@
 
             // Record an event
             client.recordEvent('pageviews', {
-                title: document.title,
-                date: new Date().toDateString()
+                ip_address: "${keen.ip}"
             });
         });
     </script>
