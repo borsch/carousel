@@ -41,7 +41,7 @@
         console.warn('Not support mobile phones in current version');
 
         _c.show();
-        //_c.removeClass('carousel-container');
+        _c.css('position', 'relative');
 	};
 
 	Carousel.prototype.init = function() {
