@@ -17,12 +17,12 @@
     <meta name="twitter:image" content="https://borsch.github.io/carousel/sample_deps/images/image.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@kurpiak">
-    <title>Carousel</title>
+    <title>Carousel by borsch</title>
 </head>
 <body>
     <div class="carousel-main-container">
         <div class="carousel-container">
-            <h2 class="title">Carousel by borsch</h2>
+            <h2 class="title">Carousel</h2>
             <div class="description">
                 The most intelligent library for carousels
                 <br />
@@ -129,5 +129,25 @@
     <script src="src/carousel.utility.js"></script>
     <script src="sample_deps/easing.js"></script>
     <script src="sample_deps/main.js"></script>
+
+    <script type="text/javascript">
+        !function(name,path,ctx){
+            var latest,prev=name!=='Keen'&&window.Keen?window.Keen:false;ctx[name]=ctx[name]||{ready:function(fn){var h=document.getElementsByTagName('head')[0],s=document.createElement('script'),w=window,loaded;s.onload=s.onerror=s.onreadystatechange=function(){if((s.readyState&&!(/^c|loade/.test(s.readyState)))||loaded){return}s.onload=s.onreadystatechange=null;loaded=1;latest=w.Keen;if(prev){w.Keen=prev}else{try{delete w.Keen}catch(e){w.Keen=void 0}}ctx[name]=latest;ctx[name].ready(fn)};s.async=1;s.src=path;h.parentNode.insertBefore(s,h)}}
+        }('KeenAsync','https://d26b395fwzu5fz.cloudfront.net/keen-tracking-1.0.3.min.js',this);
+
+        KeenAsync.ready(function(){
+            // Configure a client instance
+            var client = new KeenAsync({
+                projectId: '58a990978db53dfda8a882ef',
+                writeKey: 'B3BBA6C0DC462D5379F1B135A0AA225C6F0EEEA7B0A6D1D71B831122BCA4F5D3BBD671DCD9F8647FD2069EA714BC1BD41A048D5B7E9C3CDA030164BB5D8C738DCFF9480319618BE19C3D6821087250E019820DE63708A9CD1B4AAD7C4A585FDD'
+            });
+
+            // Record an event
+            client.recordEvent('pageviews', {
+                title: document.title,
+                date: new Date().toDateString()
+            });
+        });
+    </script>
 </body>
 </html>
