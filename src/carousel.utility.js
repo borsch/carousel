@@ -38,10 +38,10 @@
 	Carousel.prototype.mobileInit = function() {
 		var _c = this._containers;
 
-        console.error('Not support mobile phones in current version');
+        console.warn('Not support mobile phones in current version');
 
         _c.show();
-        _c.removeClass('carousel-container');
+        //_c.removeClass('carousel-container');
 	};
 
 	Carousel.prototype.init = function() {
