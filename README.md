@@ -3,7 +3,7 @@
 <h2>This is a simple util to make you langing pages more beautiful.</h2>
 
 <h3>Usage sample:</h3>
-```javascript
+<pre><code>
 CarouselInit(selector, {
   directions: [
     'left',
@@ -20,7 +20,7 @@ CarouselInit(selector, {
  // easing[optional] - function that return value in [0, 1] interval
  // tile[optional] - time for animation(change slides)
  // circle[option] - allow to move slides in circle(default is false)
-```
+</code></pre>
 
 <h3>Change Log:</h3>
 
